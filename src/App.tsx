@@ -122,9 +122,11 @@ const FAQItem = ({ q, a }: FAQItemProps) => {
 };
 
 type Step = 'LANDING' | 'SELECT_RECEIVE_NETWORK' | 'INPUT_USER_ADDRESS' | 'SELECT_PAYMENT_METHOD' | 'PAYMENT_PAGE' | 'SUCCESS';
+type ReceiveMethod = 'WALLET' | 'BINANCE_ID';
 
 export default function App() {
   const [step, setStep] = useState<Step>('LANDING');
+  const [receiveMethod, setReceiveMethod] = useState<ReceiveMethod>('WALLET');
   const [selectedPlan, setSelectedPlan] = useState<typeof PRICING_PLANS[0] | null>(null);
   const [receiveNetwork, setReceiveNetwork] = useState<typeof NETWORKS[0] | null>(null);
   const [userWalletAddress, setUserWalletAddress] = useState('');
@@ -351,25 +353,51 @@ export default function App() {
                 <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
                   <Wallet className="w-8 h-8 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-bold">Enter Your Receive Address</h2>
-                <p className="text-zinc-400">Please provide the <span className="text-white font-bold">{receiveNetwork?.name}</span> address where you want to receive the funds.</p>
+                <h2 className="text-3xl font-bold">How do you want to receive?</h2>
+                <p className="text-zinc-400">Choose your preferred method to receive the <span className="text-white font-bold">${selectedPlan?.amount.toLocaleString()}</span> Flash USDT.</p>
+              </div>
+
+              <div className="flex p-1 bg-zinc-900 rounded-2xl border border-zinc-800">
+                <button 
+                  onClick={() => {
+                    setReceiveMethod('WALLET');
+                    setUserWalletAddress('');
+                  }}
+                  className={`flex-1 py-3 rounded-xl font-bold transition-all ${receiveMethod === 'WALLET' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
+                >
+                  Wallet Address
+                </button>
+                <button 
+                  onClick={() => {
+                    setReceiveMethod('BINANCE_ID');
+                    setUserWalletAddress('');
+                  }}
+                  className={`flex-1 py-3 rounded-xl font-bold transition-all ${receiveMethod === 'BINANCE_ID' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
+                >
+                  Binance ID
+                </button>
               </div>
               
               <form onSubmit={handleUserAddressSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Your Wallet Address</label>
+                  <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                    {receiveMethod === 'WALLET' ? `${receiveNetwork?.name} Address` : 'Binance ID'}
+                  </label>
                   <input 
                     type="text"
                     required
                     value={userWalletAddress}
                     onChange={(e) => setUserWalletAddress(e.target.value)}
-                    placeholder={`Paste your ${receiveNetwork?.name} address here...`}
+                    placeholder={receiveMethod === 'WALLET' ? `Paste your ${receiveNetwork?.name} address here...` : 'Enter your 9-digit Binance ID...'}
                     className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-mono"
                   />
+                  {receiveMethod === 'BINANCE_ID' && (
+                    <p className="text-xs text-zinc-500 italic">Make sure to provide a valid Binance ID for instant internal transfer.</p>
+                  )}
                 </div>
                 <button 
                   type="submit"
-                  disabled={userWalletAddress.trim().length < 10}
+                  disabled={userWalletAddress.trim().length < (receiveMethod === 'WALLET' ? 10 : 8)}
                   className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black font-bold rounded-xl transition-all flex items-center justify-center gap-2"
                 >
                   Continue to Payment <ArrowRight className="w-5 h-5" />
@@ -484,11 +512,11 @@ export default function App() {
                           <span className="font-bold text-white">${selectedPlan?.amount.toLocaleString()} Flash USDT</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-zinc-500">Network:</span>
-                          <span className="font-bold text-white">{receiveNetwork?.name}</span>
+                          <span className="text-zinc-500">{receiveMethod === 'WALLET' ? 'Network:' : 'Method:'}</span>
+                          <span className="font-bold text-white">{receiveMethod === 'WALLET' ? receiveNetwork?.name : 'Binance Pay (ID)'}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-zinc-500">Your Address:</span>
+                          <span className="text-zinc-500">{receiveMethod === 'WALLET' ? 'Your Address:' : 'Your Binance ID:'}</span>
                           <span className="font-mono text-zinc-300 truncate ml-4 max-w-[200px]">{userWalletAddress}</span>
                         </div>
                       </div>
