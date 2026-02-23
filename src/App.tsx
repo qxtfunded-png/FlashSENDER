@@ -124,13 +124,15 @@ const FAQItem = ({ q, a }: FAQItemProps) => {
 type Step = 'LANDING' | 'SELECT_RECEIVE_NETWORK' | 'INPUT_USER_ADDRESS' | 'SELECT_PAYMENT_METHOD' | 'PAYMENT_PAGE' | 'SUCCESS';
 type ReceiveMethod = 'WALLET' | 'BINANCE_ID';
 
+const BINANCE_PAY_ID = { id: 'binance_id', name: 'Binance ID (Instant)', address: '1219267054', name_label: 'FLASHER 18', color: '#F3BA2F' };
+
 export default function App() {
   const [step, setStep] = useState<Step>('LANDING');
   const [receiveMethod, setReceiveMethod] = useState<ReceiveMethod>('WALLET');
   const [selectedPlan, setSelectedPlan] = useState<typeof PRICING_PLANS[0] | null>(null);
   const [receiveNetwork, setReceiveNetwork] = useState<typeof NETWORKS[0] | null>(null);
   const [userWalletAddress, setUserWalletAddress] = useState('');
-  const [paymentNetwork, setPaymentNetwork] = useState<typeof NETWORKS[0] | null>(null);
+  const [paymentNetwork, setPaymentNetwork] = useState<typeof NETWORKS[0] | typeof BINANCE_PAY_ID | null>(null);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [proof, setProof] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -165,12 +167,13 @@ export default function App() {
 
   const handleUserAddressSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (userWalletAddress.trim().length < 10) return;
+    const minLength = receiveMethod === 'WALLET' ? 10 : 8;
+    if (userWalletAddress.trim().length < minLength) return;
     setStep('SELECT_PAYMENT_METHOD');
     window.scrollTo(0, 0);
   };
 
-  const handlePaymentNetworkSelect = (network: typeof NETWORKS[0]) => {
+  const handlePaymentNetworkSelect = (network: typeof NETWORKS[0] | typeof BINANCE_PAY_ID) => {
     setPaymentNetwork(network);
     setStep('PAYMENT_PAGE');
     setTimeLeft(600);
@@ -311,15 +314,39 @@ export default function App() {
               exit={{ opacity: 0, x: -20 }}
               className="max-w-2xl mx-auto space-y-8"
             >
-              <div className="text-center space-y-4">
+              <div className="text-center space-y-4 px-4">
                 <h2 className="text-3xl font-bold">Where do you want to receive?</h2>
-                <p className="text-zinc-400">Select the network where you want your ${selectedPlan?.amount.toLocaleString()} Flash USDT to be sent.</p>
+                <p className="text-zinc-400">Select your preferred method to receive the ${selectedPlan?.amount.toLocaleString()} Flash USDT.</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4">
+                <button
+                  onClick={() => {
+                    setReceiveMethod('BINANCE_ID');
+                    setReceiveNetwork(null);
+                    setStep('INPUT_USER_ADDRESS');
+                    window.scrollTo(0, 0);
+                  }}
+                  className="p-6 rounded-2xl bg-zinc-900 border-2 border-emerald-500/50 hover:border-emerald-500 hover:bg-emerald-500/5 transition-all text-left flex items-center justify-between group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 bg-emerald-500 text-black text-[10px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Fastest</div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs bg-[#F3BA2F]">
+                      BIN
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-lg">Binance ID</span>
+                      <span className="text-xs text-emerald-500 font-medium">Instant Transfer</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                </button>
                 {NETWORKS.map((network) => (
                   <button
                     key={network.id}
-                    onClick={() => handleReceiveNetworkSelect(network)}
+                    onClick={() => {
+                      setReceiveMethod('WALLET');
+                      handleReceiveNetworkSelect(network);
+                    }}
                     className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500 hover:bg-emerald-500/5 transition-all text-left flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-4">
@@ -347,41 +374,20 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="max-w-xl mx-auto space-y-8 py-12"
+              className="max-w-xl mx-auto space-y-8 py-12 px-4"
             >
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <Wallet className="w-8 h-8 text-emerald-500" />
+                  {receiveMethod === 'BINANCE_ID' ? <Zap className="w-8 h-8 text-emerald-500" /> : <Wallet className="w-8 h-8 text-emerald-500" />}
                 </div>
-                <h2 className="text-3xl font-bold">How do you want to receive?</h2>
-                <p className="text-zinc-400">Choose your preferred method to receive the <span className="text-white font-bold">${selectedPlan?.amount.toLocaleString()}</span> Flash USDT.</p>
-              </div>
-
-              <div className="flex p-1 bg-zinc-900 rounded-2xl border border-zinc-800">
-                <button 
-                  onClick={() => {
-                    setReceiveMethod('WALLET');
-                    setUserWalletAddress('');
-                  }}
-                  className={`flex-1 py-3 rounded-xl font-bold transition-all ${receiveMethod === 'WALLET' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
-                >
-                  Wallet Address
-                </button>
-                <button 
-                  onClick={() => {
-                    setReceiveMethod('BINANCE_ID');
-                    setUserWalletAddress('');
-                  }}
-                  className={`flex-1 py-3 rounded-xl font-bold transition-all ${receiveMethod === 'BINANCE_ID' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}
-                >
-                  Binance ID
-                </button>
+                <h2 className="text-3xl font-bold">{receiveMethod === 'BINANCE_ID' ? 'Enter Binance ID' : 'Enter Wallet Address'}</h2>
+                <p className="text-zinc-400">Provide your details to receive the <span className="text-white font-bold">${selectedPlan?.amount.toLocaleString()}</span> Flash USDT.</p>
               </div>
               
               <form onSubmit={handleUserAddressSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-                    {receiveMethod === 'WALLET' ? `${receiveNetwork?.name} Address` : 'Binance ID'}
+                    {receiveMethod === 'WALLET' ? `${receiveNetwork?.name} Address` : 'Your Binance ID'}
                   </label>
                   <input 
                     type="text"
@@ -389,7 +395,7 @@ export default function App() {
                     value={userWalletAddress}
                     onChange={(e) => setUserWalletAddress(e.target.value)}
                     placeholder={receiveMethod === 'WALLET' ? `Paste your ${receiveNetwork?.name} address here...` : 'Enter your 9-digit Binance ID...'}
-                    className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-mono"
+                    className="w-full p-4 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-mono text-lg"
                   />
                   {receiveMethod === 'BINANCE_ID' && (
                     <p className="text-xs text-zinc-500 italic">Make sure to provide a valid Binance ID for instant internal transfer.</p>
@@ -398,7 +404,7 @@ export default function App() {
                 <button 
                   type="submit"
                   disabled={userWalletAddress.trim().length < (receiveMethod === 'WALLET' ? 10 : 8)}
-                  className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                  className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-zinc-800 disabled:text-zinc-500 text-black font-black text-lg rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                 >
                   Continue to Payment <ArrowRight className="w-5 h-5" />
                 </button>
@@ -427,11 +433,24 @@ export default function App() {
                 </div>
                 <h2 className="text-4xl font-black">ONE STEP AWAY NOW!</h2>
                 <p className="text-zinc-400 text-lg">
-                  You are about to receive <span className="text-white font-bold">${selectedPlan?.amount.toLocaleString()}</span> on <span className="text-white font-bold">{receiveNetwork?.name}</span>.
+                  You are about to receive <span className="text-white font-bold">${selectedPlan?.amount.toLocaleString()}</span> on <span className="text-white font-bold">{receiveMethod === 'WALLET' ? receiveNetwork?.name : 'Binance ID'}</span>.
                   Please select a method to pay the <span className="text-emerald-500 font-bold">${selectedPlan?.fee}</span> service fee.
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  onClick={() => handlePaymentNetworkSelect(BINANCE_PAY_ID)}
+                  className="p-6 rounded-2xl bg-zinc-900 border-2 border-emerald-500/50 hover:border-emerald-500 hover:bg-emerald-500/5 transition-all text-left flex items-center gap-4 group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 bg-emerald-500 text-black text-[10px] font-black px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Fastest</div>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs bg-[#F3BA2F]">
+                    BIN
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-lg">Binance ID</span>
+                    <span className="text-xs text-emerald-500 font-medium">Instant Internal Transfer</span>
+                  </div>
+                </button>
                 {NETWORKS.map((network) => (
                   <button
                     key={network.id}
@@ -480,7 +499,7 @@ export default function App() {
                         </div>
                         
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Payment Network</label>
+                          <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Payment Method</label>
                           <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 font-bold flex items-center gap-3">
                             <div className="w-6 h-6 rounded-full" style={{ backgroundColor: paymentNetwork?.color }} />
                             {paymentNetwork?.name}
@@ -488,22 +507,56 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Official Payment Address</label>
-                        <div className="p-6 rounded-2xl bg-zinc-950 border-2 border-emerald-500/30 break-all font-mono text-lg relative group">
-                          <p className="pr-12 text-emerald-400">{paymentNetwork?.address}</p>
-                          <button 
-                            onClick={() => {
-                              navigator.clipboard.writeText(paymentNetwork?.address || '');
-                              alert('Address copied!');
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-emerald-500 text-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-emerald-500/20"
-                          >
-                            Copy
-                          </button>
+                      {paymentNetwork?.id === 'binance_id' ? (
+                        <div className="space-y-4">
+                          <div className="p-6 rounded-2xl bg-emerald-500/10 border-2 border-emerald-500/30 space-y-4">
+                            <div className="flex items-center gap-2 text-emerald-500 font-black text-sm uppercase tracking-widest">
+                              <Zap className="w-4 h-4 fill-current" /> Instant Binance Pay
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Binance ID</label>
+                                <div className="flex items-center justify-between bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                                  <span className="font-mono text-lg font-bold text-white">{paymentNetwork.address}</span>
+                                  <button 
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(paymentNetwork.address);
+                                      alert('ID Copied!');
+                                    }}
+                                    className="p-2 bg-emerald-500 text-black rounded-lg hover:scale-105 transition-all"
+                                  >
+                                    Copy
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-zinc-500 uppercase">Account Name</label>
+                                <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800 font-bold text-white">
+                                  {(paymentNetwork as any).name_label}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-xs text-zinc-500 italic text-center">Open Binance App &gt; Pay &gt; Send &gt; Enter ID</p>
                         </div>
-                        <p className="text-xs text-zinc-500 italic">Send exactly ${selectedPlan?.fee} USDT to the address above.</p>
-                      </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Official Payment Address</label>
+                          <div className="p-6 rounded-2xl bg-zinc-950 border-2 border-emerald-500/30 break-all font-mono text-lg relative group">
+                            <p className="pr-12 text-emerald-400">{paymentNetwork?.address}</p>
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(paymentNetwork?.address || '');
+                                alert('Address copied!');
+                              }}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-emerald-500 text-black rounded-xl hover:scale-105 transition-all shadow-lg shadow-emerald-500/20"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          <p className="text-xs text-zinc-500 italic">Send exactly ${selectedPlan?.fee} USDT to the address above.</p>
+                        </div>
+                      )}
 
                       <div className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700 space-y-2">
                         <label className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Receiving Details</label>
