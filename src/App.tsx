@@ -33,16 +33,16 @@ const PRICING_PLANS = [
 ];
 
 const NETWORKS = [
-  { id: 'trc20', name: 'TRC20 (Tron)', address: 'TH3oghYsLZr5Wt9vHPAUyvf6xuk4yhMJ76', color: '#FF0013' },
-  { id: 'bep20', name: 'BEP20 (BSC)', address: '0x8cf3b6a3c1d33055bbedf778ac3a80e76c3d0349', color: '#F3BA2F' },
-  { id: 'erc20', name: 'ERC20 (Ethereum)', address: '0x8cf3b6a3c1d33055bbedf778ac3a80e76c3d0349', color: '#627EEA' },
-  { id: 'solana', name: 'Solana (SOL)', address: 'BLVdBsEJEc2TTcwCQiSMUCeQygqKnew2Ln6uw9GrxFSk', color: '#14F195' },
+  { id: 'trc20', name: 'TRC20 (Tron)', address: 'TC1QoUn778ZEpLzThheNGtQsPqg7QpmnkH', color: '#FF0013' },
+  { id: 'bep20', name: 'BEP20 (BSC)', address: '0xca8c9363e2b2907f2fe1e74cddae7713f4b23a92', color: '#F3BA2F' },
+  { id: 'erc20', name: 'ERC20 (Ethereum)', address: '0xca8c9363e2b2907f2fe1e74cddae7713f4b23a92', color: '#627EEA' },
+  { id: 'solana', name: 'Solana (SOL)', address: '2FuPShQrsKEJsz5M1b1NYCrYsTP9iaS2iVrKj4eNUkWC', color: '#14F195' },
   { id: 'ton', name: 'TON (Toncoin)', address: 'UQBAvsFLKXx5BPg2EG7XJZxX5Vos65ff0qrRjXVJuHf81mdL', color: '#0088CC' },
   { id: 'aptos', name: 'Aptos', address: '0x5031a26140f9f81dcd0dd138602d872a642fe0ea82c394769945d031f3f1d6f0', color: '#000000' },
-  { id: 'polygon', name: 'Polygon (Matic)', address: '0x8cf3b6a3c1d33055bbedf778ac3a80e76c3d0349', color: '#8247E5' },
-  { id: 'arbitrum', name: 'Arbitrum One', address: '0x8cf3b6a3c1d33055bbedf778ac3a80e76c3d0349', color: '#28A0F0' },
-  { id: 'plasma', name: 'Plasma', address: '0x8cf3b6a3c1d33055bbedf778ac3a80e76c3d0349', color: '#FF4500' },
-  { id: 'btc', name: 'Bitcoin (BTC)', address: '3Le2oaudBvU4GcmKn8mg19SVoEofrQry3V', color: '#F7931A' },
+  { id: 'polygon', name: 'Polygon (Matic)', address: '0xca8c9363e2b2907f2fe1e74cddae7713f4b23a92', color: '#8247E5' },
+  { id: 'arbitrum', name: 'Arbitrum One', address: '0xca8c9363e2b2907f2fe1e74cddae7713f4b23a92', color: '#28A0F0' },
+  { id: 'plasma', name: 'Plasma', address: '0xca8c9363e2b2907f2fe1e74cddae7713f4b23a92', color: '#FF4500' },
+  { id: 'btc', name: 'Bitcoin (BTC)', address: 'bc1qaey4xq8lvkkxyhnzs8w79p56xfzlk3q094py59', color: '#F7931A' },
 ];
 
 const FAQS = [
