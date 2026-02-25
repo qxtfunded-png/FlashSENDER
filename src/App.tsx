@@ -25,11 +25,11 @@ import { motion, AnimatePresence } from 'motion/react';
 // --- Constants & Data ---
 
 const PRICING_PLANS = [
-  { amount: 3000, fee: 30, label: "Starter" },
-  { amount: 6000, fee: 50, label: "Pro" },
-  { amount: 10000, fee: 85, label: "Advanced" },
-  { amount: 25000, fee: 180, label: "Elite" },
-  { amount: 50000, fee: 350, label: "Whale" },
+  { amount: 3000, fee: 45, label: "Starter" },
+  { amount: 6000, fee: 75, label: "Pro" },
+  { amount: 10000, fee: 130, label: "Advanced" },
+  { amount: 25000, fee: 270, label: "Elite" },
+  { amount: 50000, fee: 525, label: "Whale" },
 ];
 
 const NETWORKS = [
