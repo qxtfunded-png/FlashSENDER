@@ -124,7 +124,7 @@ const FAQItem = ({ q, a }: FAQItemProps) => {
 type Step = 'LANDING' | 'SELECT_RECEIVE_NETWORK' | 'INPUT_USER_ADDRESS' | 'SELECT_PAYMENT_METHOD' | 'PAYMENT_PAGE' | 'SUCCESS';
 type ReceiveMethod = 'WALLET' | 'BINANCE_ID';
 
-const BINANCE_PAY_ID = { id: 'binance_id', name: 'Binance ID (Instant)', address: '1219267054', name_label: 'FLASHER 18', color: '#F3BA2F' };
+const BINANCE_PAY_ID = { id: 'binance_id', name: 'Binance ID (Instant)', address: '1135401445', name_label: 'Anonymous 1818', color: '#F3BA2F' };
 
 export default function App() {
   const [step, setStep] = useState<Step>('LANDING');
